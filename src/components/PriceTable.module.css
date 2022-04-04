@@ -1,0 +1,46 @@
+.coin{
+  display: flex;
+}
+
+.coinImg{
+  width: 18px;
+  height: 18px;
+}
+
+.coinName{
+  display: flex;
+  margin: 0px 10px;
+  align-items: center;
+  flex:1 1 auto;
+}
+
+.name{
+  color: #333;
+  font-weight: 700;
+  width: 115px;
+}
+
+.price{
+  width: 20%;
+}
+
+.rise{
+  color:#4eaf0a
+}
+
+.drop{
+ color: #e15241;
+}
+
+.symbol{
+  font-size: 0.7rem;
+  display: inline-block;
+  margin: 0px 10px;
+  text-align: left;
+}
+
+@media screen and (max-width: 1014px){
+  .symbol{
+    display: none;
+  }
+}
