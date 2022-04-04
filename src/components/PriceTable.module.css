@@ -5,6 +5,7 @@
 .coinImg{
   width: 18px;
   height: 18px;
+  margin: auto;
 }
 
 .coinName{
@@ -20,9 +21,9 @@
   width: 115px;
 }
 
-.price{
-  width: 20%;
-}
+/* .price{
+  width: 10%;
+} */
 
 .rise{
   color:#4eaf0a

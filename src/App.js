@@ -5,7 +5,7 @@ import Test from "./components/Test";
 function App() {
   return (
     <div className="App">
-      <h2>Cryptocurrency Prices by Market Cap</h2>
+      <h2 id="title">Cryptocurrency Prices by Market Cap</h2>
       <PriceTable />
       {/* <Test /> */}
     </div>

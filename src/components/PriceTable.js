@@ -5,56 +5,28 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableFooter from "@mui/material/TableFooter";
-import TableHead from "@mui/material/TableHead";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/system";
 import style from "./PriceTable.module.css";
-
-const columns = [
-  { id: "rank", label: "#", align: "left" },
-  { id: "coin", label: "Coin", align: "left" },
-  {
-    id: "price",
-    label: "Price",
-    align: "right",
-  },
-  {
-    id: "h1",
-    label: "1h",
-    align: "right",
-  },
-  {
-    id: "h24",
-    label: "24h",
-    align: "right",
-  },
-  {
-    id: "d7",
-    label: "7d",
-    align: "right",
-  },
-  {
-    id: "h24volume",
-    label: "24h\u00a0Volume",
-    align: "right",
-  },
-  {
-    id: "mkt",
-    label: "Mkt\u00a0Cap",
-    align: "right",
-  },
-  {
-    id: "last7d",
-    label: "Last\u00a07\u00a0Days",
-    align: "center",
-  },
-];
+import CustomPagination from "./CustomPagination";
+import EnhancedTableHead from "./EnhancedTableHead";
 
 const PriceTable = () => {
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [rows, setRows] = useState([]);
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("");
+  const columns = [
+    { id: "rank", label: "#", align: "left" },
+    { id: "coin", label: "Coin", align: "left" },
+    { id: "price", label: "Price", align: "right" },
+    { id: "h1", label: "1h", align: "right" },
+    { id: "h24", label: "24h", align: "right" },
+    { id: "d7", label: "7d", align: "right" },
+    { id: "h24volume", label: "24h\u00a0Volume", align: "right" },
+    { id: "mkt", label: "Mkt\u00a0Cap", align: "right" },
+    { id: "last7d", label: "Last\u00a07\u00a0Days", align: "center" },
+  ];
   const createData = (
     rank,
     coin,
@@ -77,7 +49,7 @@ const PriceTable = () => {
           params: {
             vs_currency: "usd",
             per_page: 100,
-            page: currentPage + 1,
+            page: currentPage,
             sparkline: true,
             price_change_percentage: "1h,24h,7d",
           },
@@ -100,9 +72,35 @@ const PriceTable = () => {
     };
     fetchData();
   }, [currentPage]);
-  const handleChangePage = (event, newPage) => {
+
+  const descendingComparator = (a, b, orderBy) => {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  };
+
+  const getComparator = (order, orderBy) => {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  };
+  const handleChangePage = (newPage) => {
     setCurrentPage(newPage);
   };
+  const ChangePageByValue = (value) => {
+    setCurrentPage(currentPage + value);
+  };
+
+  const handleRequestSort = (event, property) => {
+    const isAsc = orderBy === property && order === "asc";
+    setOrder(isAsc ? "desc" : "asc");
+    setOrderBy(property);
+  };
+
   const Root = styled("div")(
     ({ theme }) => `
   td, th{
@@ -112,7 +110,7 @@ const PriceTable = () => {
     font-weight: bold;
   }
 
-  @media screen and (max-width: 1014px){
+  @media screen and (max-width: 1200px){
     table thead tr th:nth-of-type(1){
       position: sticky;
       left:0px;
@@ -121,8 +119,7 @@ const PriceTable = () => {
     }
     table thead tr th:nth-of-type(2){
       position: sticky;
-      width: 70px;
-      left: 56px;
+      left: 60px;
       background-color: white;
       z-index:100;
     }
@@ -136,8 +133,7 @@ const PriceTable = () => {
 
      table tbody tr td:nth-of-type(2){
       position: sticky;
-      width: 70px;
-      left: 56px;
+      left: 60px;
       background-color: white;
     }
   }
@@ -155,84 +151,85 @@ const PriceTable = () => {
       return "none";
     }
   };
+
   return (
-    <Root sx={{ width: "100%", overflowX: "scroll" }}>
-      <Table stickyHeader aria-label="Cryptocurrency Prices">
-        <TableHead>
-          <TableRow>
-            {columns.map((column) => (
-              <TableCell
-                key={column.id}
-                align={column.align}
-                style={{ minWidth: column.minWidth }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => {
-            return (
-              <TableRow hover role="checkbox" tabIndex={-1} key={row.rank}>
-                <TableCell align="left">{row.rank}</TableCell>
-                <TableCell align="left">
-                  <span className={style.coin}>
-                    <img
-                      className={style.coinImg}
-                      loading="lazy"
-                      src={row.coin[0]}
-                      alt={row.coin[1]}
-                    ></img>
-                    <span className={style.coinName}>
-                      <span className={style.name}>{row.coin[1]}</span>
-                      <span className={style.symbol}>
-                        {row.coin[2].toUpperCase()}
+    <>
+      <TableContainer component={Paper} sx={{ overflow: "scroll" }}>
+        <Root sx={{ width: "1350px", maxHeight: "80vh" }}>
+          <Table stickyHeader aria-label="Cryptocurrency Prices">
+            <EnhancedTableHead
+              order={order}
+              orderBy={orderBy}
+              onRequestSort={handleRequestSort}
+              columns={columns}
+            />
+            <TableBody>
+              {rows.sort(getComparator(order, orderBy)).map((row) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.name}>
+                    <TableCell align="left">{row.rank}</TableCell>
+                    <TableCell align="left">
+                      <span className={style.coin}>
+                        <img
+                          className={style.coinImg}
+                          loading="lazy"
+                          src={row.coin[0]}
+                          alt={row.coin[1]}
+                        ></img>
+                        <span className={style.coinName}>
+                          <span className={style.name}>{row.coin[1]}</span>
+                          <span className={style.symbol}>
+                            {row.coin[2].toUpperCase()}
+                          </span>
+                        </span>
                       </span>
-                    </span>
-                  </span>
-                </TableCell>
-                <TableCell align="right" className={style.price}>
-                  {`$${row.price.toLocaleString("en-US")}`}
-                </TableCell>
-                <TableCell align="right">
-                  <span className={determineColor(row.h1)}>
-                    {`${row.h1.toFixed(1)}%`}
-                  </span>
-                </TableCell>
-                <TableCell align="right">
-                  <span className={determineColor(row.h24)}>{`${row.h24.toFixed(
-                    1
-                  )}%`}</span>
-                </TableCell>
-                <TableCell align="right">
-                  <span className={determineColor(row.d7)}>{`${row.d7.toFixed(
-                    1
-                  )}%`}</span>
-                </TableCell>
-                <TableCell align="right">{`$${row.h24volume.toLocaleString(
-                  "en-US"
-                )}`}</TableCell>
-                <TableCell align="right">{`$${row.mkt.toLocaleString(
-                  "en-US"
-                )}`}</TableCell>
-                <TableCell align="center">{`$${row.mkt.toLocaleString(
-                  "en-US"
-                )}`}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-      <TablePagination
-        rowsPerPageOptions={[]}
-        component="div"
-        count={13500}
-        rowsPerPage={100}
-        page={currentPage}
-        onPageChange={handleChangePage}
+                    </TableCell>
+                    <TableCell align="right" className={style.price}>
+                      {row.price
+                        ? `$${row.price.toLocaleString("en-US")}`
+                        : "?"}
+                    </TableCell>
+                    <TableCell align="right">
+                      <span className={determineColor(row.h1)}>
+                        {row.h1 ? `${row.h1.toFixed(1)}%` : "?"}
+                      </span>
+                    </TableCell>
+                    <TableCell align="right">
+                      <span className={determineColor(row.h24)}>
+                        {row.h24 ? `${row.h24.toFixed(1)}%` : "?"}
+                      </span>
+                    </TableCell>
+                    <TableCell align="right">
+                      <span className={determineColor(row.d7)}>
+                        {row.d7 ? `${row.d7.toFixed(1)}%` : "?"}
+                      </span>
+                    </TableCell>
+                    <TableCell align="right">
+                      {row.h24volume
+                        ? `$${row.h24volume.toLocaleString("en-US")}`
+                        : "?"}
+                    </TableCell>
+                    <TableCell align="right">
+                      {row.mkt ? `$${row.mkt.toLocaleString("en-US")}` : "?"}
+                    </TableCell>
+                    <TableCell align="center">
+                      {row.last7d
+                        ? `$${row.last7d.toLocaleString("en-US")}`
+                        : ""}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Root>
+      </TableContainer>
+      <CustomPagination
+        currentPage={currentPage}
+        onChange={handleChangePage}
+        changePage={ChangePageByValue}
       />
-    </Root>
+    </>
   );
 };
 
