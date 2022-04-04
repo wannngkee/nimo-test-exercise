@@ -73,6 +73,7 @@ const PriceTable = () => {
     fetchData();
   }, [currentPage]);
 
+  // Function to compare value based on specific column
   const descendingComparator = (a, b, orderBy) => {
     if (b[orderBy] < a[orderBy]) {
       return -1;
@@ -83,18 +84,24 @@ const PriceTable = () => {
     return 0;
   };
 
+  // Function to sort value in descending or ascending order
   const getComparator = (order, orderBy) => {
     return order === "desc"
       ? (a, b) => descendingComparator(a, b, orderBy)
       : (a, b) => -descendingComparator(a, b, orderBy);
   };
+
+  // Function to change current page to a specific value
   const handleChangePage = (newPage) => {
     setCurrentPage(newPage);
   };
+
+  // Function to change current page with 'pre' or 'next' button
   const ChangePageByValue = (value) => {
     setCurrentPage(currentPage + value);
   };
 
+  // Function to handle sorting action
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
