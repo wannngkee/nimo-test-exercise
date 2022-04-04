@@ -4,7 +4,7 @@ import PriceTable from "./components/PriceTable";
 function App() {
   return (
     <div className="App">
-      <h2 id="title">Cryptocurrency Prices by Market Cap</h2>
+      <h2>Cryptocurrency Prices by Market Cap</h2>
       <PriceTable />
     </div>
   );
