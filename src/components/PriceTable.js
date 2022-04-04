@@ -184,7 +184,7 @@ const PriceTable = () => {
                         </span>
                       </span>
                     </TableCell>
-                    <TableCell align="right" className={style.price}>
+                    <TableCell align="right">
                       {row.price
                         ? `$${row.price.toLocaleString("en-US")}`
                         : "?"}
